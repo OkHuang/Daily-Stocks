@@ -1,31 +1,13 @@
-"""
-LLM 提示词模板模块 - LLM Prompt Templates Module
-
-该模块预留用于存储和管理面向 LLM 的提示词模板。
-This module is reserved for storing and managing LLM-oriented prompt templates.
-
-【注意】此模块为预留扩展模块，目前未实现具体功能。
-【NOTE】This module is reserved for future expansion and is not currently implemented.
-"""
+"""LLM 提示词模板模块（预留扩展，暂未实现）"""
 
 from typing import Dict, Any
 import pandas as pd
 
 
 class PromptTemplates:
-    """
-    提示词模板管理类
-    Prompt templates manager
-
-    管理用于调用 LLM 分析选股结果的提示词模板。
-    Manages prompt templates for calling LLM to analyze stock selection results.
-    """
+    """提示词模板管理类"""
 
     def __init__(self):
-        """
-        初始化提示词模板管理器
-        Initialize prompt templates manager
-        """
         self.templates = {
             'analysis': self._get_analysis_template(),
             'summary': self._get_summary_template(),
@@ -33,13 +15,7 @@ class PromptTemplates:
         }
 
     def _get_analysis_template(self) -> str:
-        """
-        获取选股分析提示词模板
-        Get stock selection analysis prompt template
-
-        返回 (Returns):
-            str: 提示词模板 (Prompt template)
-        """
+        """获取选股分析提示词模板"""
         template = """
 # 股票选股结果分析
 
@@ -64,13 +40,7 @@ class PromptTemplates:
         return template
 
     def _get_summary_template(self) -> str:
-        """
-        获取选股摘要提示词模板
-        Get stock selection summary prompt template
-
-        返回 (Returns):
-            str: 提示词模板 (Prompt template)
-        """
+        """获取选股摘要提示词模板"""
         template = """
 # 选股摘要
 
@@ -87,13 +57,7 @@ class PromptTemplates:
         return template
 
     def _get_risk_alert_template(self) -> str:
-        """
-        获取风险提示提示词模板
-        Get risk alert prompt template
-
-        返回 (Returns):
-            str: 提示词模板 (Prompt template)
-        """
+        """获取风险提示提示词模板"""
         template = """
 # 投资风险提示
 
@@ -117,17 +81,7 @@ class PromptTemplates:
         template_name: str,
         **kwargs
     ) -> str:
-        """
-        填充提示词模板
-        Fill prompt template
-
-        参数 (Parameters):
-            template_name: 模板名称 (Template name)
-            **kwargs: 模板变量 (Template variables)
-
-        返回 (Returns):
-            str: 填充后的提示词 (Filled prompt)
-        """
+        """填充提示词模板"""
         template = self.templates.get(template_name)
         if template is None:
             raise ValueError(f"Template not found: {template_name}")

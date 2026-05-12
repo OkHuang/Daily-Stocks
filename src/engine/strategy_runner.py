@@ -1,9 +1,4 @@
-"""
-策略执行器模块 - Strategy Runner Module
-
-该模块负责批量执行多个选股策略。
-This module is responsible for batch executing multiple stock selection strategies.
-"""
+"""策略执行器模块"""
 
 from typing import Dict, List, Any
 import pandas as pd
@@ -47,23 +42,9 @@ def _worker_process_stock(stock_code: str, df_data: pd.DataFrame, config_path: s
 
 
 class StrategyRunner:
-    """
-    策略执行器
-    Strategy runner
-
-    负责加载策略配置，批量执行多个策略，返回所有股票的信号结果。
-    Responsible for loading strategy configurations, batch executing multiple strategies, and returning signal results for all stocks.
-    """
+    """策略执行器，批量加载和执行多个选股策略"""
 
     def __init__(self, config_path: str = "strategies.yaml", logger: logging.Logger = None):
-        """
-        初始化策略执行器
-        Initialize strategy runner
-
-        参数 (Parameters):
-            config_path: 策略配置文件路径 (Strategy configuration file path)
-            logger: 日志记录器 (Logger instance)
-        """
         self.config_path = config_path
         self.strategies: Dict[str, Strategy] = {}
         self.logger = logger or logging.getLogger(__name__)
@@ -83,13 +64,7 @@ class StrategyRunner:
         return stock_data
 
     def _load_strategies(self):
-        """
-        从配置文件加载策略
-        Load strategies from configuration file
-
-        读取 strategies.yaml，实例化已启用的策略。
-        Reads strategies.yaml and instantiates enabled strategies.
-        """
+        """从 strategies.yaml 加载并实例化已启用的策略"""
         config_file = Path(self.config_path)
         if not config_file.exists():
             raise FileNotFoundError(f"Strategy config file not found: {self.config_path}")
@@ -100,7 +75,6 @@ class StrategyRunner:
         strategies_config = config.get('strategies', {})
 
         # 策略注册表
-        # Strategy registry
         strategy_registry = {
             'ma_cross': MACrossStrategy,
             'rsi_oversold': RSIOversoldStrategy,
@@ -110,7 +84,6 @@ class StrategyRunner:
         }
 
         # 实例化已启用的策略
-        # Instantiate enabled strategies
         for strategy_name, strategy_config in strategies_config.items():
             if strategy_config.get('enabled', False):
                 strategy_class = strategy_registry.get(strategy_name)
@@ -122,46 +95,27 @@ class StrategyRunner:
                     self.logger.warning(f"Unknown strategy: {strategy_name}")
 
     def _precompute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        预计算常用技术指标并缓存
-        Precompute common technical indicators and cache them
-
-        这个方法会在 DataFrame 中添加常用的技术指标列，
-        避免每个策略重复计算相同的指标。
-
-        This method adds common technical indicator columns to the DataFrame,
-        avoiding repeated calculations in each strategy.
-
-        参数 (Parameters):
-            df: 原始数据 (Original data)
-
-        返回 (Returns):
-            pd.DataFrame: 添加了指标列的数据 (Data with indicator columns added)
-        """
+        """预计算常用技术指标，避免每个策略重复计算"""
         if df is None or len(df) < 50:
             return df
 
         # 检查是否已经预计算过
-        # Check if already precomputed
         if '__precomputed__' in df.columns:
             return df
 
         n_before = len(df.columns)
 
-        # 预计算常用指标
-        # Precompute common indicators
-
-        # 移动平均线 (Moving averages)
+        # 移动平均线
         df['ma5'] = calculate_ma(df, period=5, column='close')
         df['ma10'] = calculate_ma(df, period=10, column='close')
         df['ma20'] = calculate_ma(df, period=20, column='close')
         df['ma60'] = calculate_ma(df, period=60, column='close')
 
-        # EMA (Exponential moving averages)
+        # EMA
         df['ema12'] = calculate_ema(df, period=12, column='close')
         df['ema26'] = calculate_ema(df, period=26, column='close')
 
-        # RSI (Relative strength index)
+        # RSI
         df['rsi6'] = calculate_rsi(df, period=6, column='close')
         df['rsi12'] = calculate_rsi(df, period=12, column='close')
         df['rsi24'] = calculate_rsi(df, period=24, column='close')
@@ -179,7 +133,6 @@ class StrategyRunner:
         df['kdj_j'] = j
 
         # 标记已预计算
-        # Mark as precomputed
         df['__precomputed__'] = True
 
         self.logger.debug(f"Precomputed {len(df.columns) - n_before - 1} indicator columns")

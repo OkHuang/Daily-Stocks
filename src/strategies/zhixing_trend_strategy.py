@@ -1,10 +1,6 @@
-"""
-知行趋势策略 - Zhixing Trend Strategy
+"""知行趋势策略
 
-该模块实现了基于知行多空线和知行短期趋势线的选股策略。
-This module implements a stock selection strategy based on Zhixing Bull-Bear Line and Zhixing Short-term Trend Line.
-
-策略条件 (Strategy Conditions):
+策略条件：
     1. 股价高于当日知行多空线价格
     2. 当前日J值 < 13
     3. 知行短期趋势线价格大于知行多空线价格
@@ -19,32 +15,9 @@ from .base import Strategy
 
 
 class ZhixingTrendStrategy(Strategy):
-    """
-    知行趋势策略
-    Zhixing Trend Strategy
-
-    综合使用知行多空线、知行短期趋势线、KDJ、振幅和成交量进行选股。
-    Combines Zhixing Bull-Bear Line, Zhixing Short-term Trend Line, KDJ, amplitude, and volume for stock selection.
-    """
+    """综合知行多空线、短期趋势线、KDJ、振幅和成交量选股"""
 
     def __init__(self, params: Dict[str, Any] = None):
-        """
-        初始化知行趋势策略
-        Initialize Zhixing trend strategy
-
-        参数 (Parameters):
-            params: 策略参数 (Strategy parameters):
-                - zhixing_bb_p1: 知行多空线第一条均线周期（默认14）(Zhixing BB line MA1 period, default 14)
-                - zhixing_bb_p2: 知行多空线第二条均线周期（默认28）(Zhixing BB line MA2 period, default 28)
-                - zhixing_bb_p3: 知行多空线第三条均线周期（默认57）(Zhixing BB line MA3 period, default 57)
-                - zhixing_bb_p4: 知行多空线第四条均线周期（默认114）(Zhixing BB line MA4 period, default 114)
-                - short_trend_period: 知行短期趋势线周期（默认10）(Short-term trend line period, default 10)
-                - j_threshold: J值阈值（默认13）(J value threshold, default 13)
-                - amplitude_threshold: 振幅阈值（默认4%）(Amplitude threshold, default 4)
-                - volume_ma_period: 成交量均线周期（默认12）(Volume MA period, default 12)
-                - volume_ratio_threshold: 成交量比例阈值（默认52%）(Volume ratio threshold, default 52)
-                - weight: 信号权重（默认1.0）(Signal weight, default 1.0)
-        """
         default_params = {
             'zhixing_bb_p1': 14,
             'zhixing_bb_p2': 28,
@@ -65,16 +38,6 @@ class ZhixingTrendStrategy(Strategy):
         super().__init__(name="Zhixing Trend", params=default_params)
 
     def calculate(self, df: pd.DataFrame) -> pd.Series:
-        """
-        计算知行趋势策略信号
-        Calculate Zhixing trend strategy signals
-
-        参数 (Parameters):
-            df: 股票行情数据 (Stock market data)
-
-        返回 (Returns):
-            pd.Series: 信号序列，索引为交易日期 (Signal series with trading dates as index)
-        """
         # 获取参数
         p1 = self.params['zhixing_bb_p1']
         p2 = self.params['zhixing_bb_p2']
@@ -115,16 +78,7 @@ class ZhixingTrendStrategy(Strategy):
         return result
 
     def _calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        计算所需的技术指标
-        Calculate required technical indicators
-
-        参数 (Parameters):
-            df: 股票行情数据 (Stock market data)
-
-        返回 (Returns):
-            pd.DataFrame: 添加了指标列的DataFrame (DataFrame with indicator columns added)
-        """
+        """计算所需技术指标（优先使用预计算的指标）"""
         # 1. 计算知行多空线
         ma1 = df['close'].rolling(window=self.params['zhixing_bb_p1']).mean()
         ma2 = df['close'].rolling(window=self.params['zhixing_bb_p2']).mean()
@@ -137,19 +91,16 @@ class ZhixingTrendStrategy(Strategy):
         df['short_trend'] = ema1.ewm(span=self.params['short_trend_period'], adjust=False).mean()
 
         # 3. 使用预计算的KDJ指标（如果参数匹配）或重新计算
-        # Use precomputed KDJ indicators (if params match) or recalculate
         has_precomputed = '__precomputed__' in df.columns
 
         if (has_precomputed and
             self.params['kdj_n_period'] == 9 and
             self.params['kdj_m1_period'] == 3 and
             self.params['kdj_m2_period'] == 3):
-            # 使用预计算的指标 (Use precomputed indicators)
             df['k'] = df['kdj_k']
             df['d'] = df['kdj_d']
             df['j'] = df['kdj_j']
         else:
-            # 重新计算KDJ指标 (Recalculate KDJ indicators)
             n_period = self.params['kdj_n_period']
             low_min = df['low'].rolling(window=n_period).min()
             high_max = df['high'].rolling(window=n_period).max()
