@@ -20,13 +20,6 @@ class Formatter:
     Provides result output functionality in various formats including CSV, Excel, Markdown, and terminal tables.
     """
 
-    def __init__(self):
-        """
-        初始化格式化器
-        Initialize formatter
-        """
-        pass
-
     def _prepare_export_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         准备导出的数据框（统一的列筛选逻辑）

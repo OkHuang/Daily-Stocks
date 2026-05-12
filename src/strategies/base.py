@@ -140,18 +140,3 @@ class StrategyMixin:
         result = pd.Series(0.0, index=df['trade_date'])
         result.iloc[signals.index] = signals.values
         return result
-
-    def validate_signal(self, signal: float) -> bool:
-        """
-        验证信号有效性
-        Validate signal validity
-
-        参数 (Parameters):
-            signal: 信号值 (Signal value)
-
-        返回 (Returns):
-            bool: 信号是否有效 (Whether the signal is valid)
-        """
-        # 默认验证规则：信号值在 0-1 之间
-        # Default validation rule: signal value is between 0-1
-        return 0 <= signal <= 1
