@@ -278,46 +278,9 @@ def calculate_zhixing_short_trend(
     period: int = 10,
     column: str = 'close'
 ) -> pd.Series:
-    """
-    计算知行短期趋势线 (Zhixing Short-term Trend Line)
-
-    知行短期趋势线是双重指数移动平均线，对价格进行两次平滑。
-    Zhixing short-term trend line is a double EMA, smoothing price twice.
-
-    计算公式 (Formula):
-        知行短期趋势线 = EMA(EMA(收盘价, period), period)
-        Trend = EMA(EMA(Close, period), period)
-
-    特点 (Characteristics):
-        - 比单次 EMA 更平滑 (Smoother than single EMA)
-        - 滞后性稍大，但更稳定 (More lag but more stable)
-        - 适合识别短期趋势方向 (Suitable for identifying short-term trend)
-
-    参数 (Parameters):
-        df: 包含价格数据的 DataFrame (DataFrame containing price data)
-        period: EMA 周期，默认 10 (EMA period, default 10)
-        column: 价格列名 (Price column name)
-
-    返回 (Returns):
-        pd.Series: 知行短期趋势线序列 (Zhixing short-term trend line series)
-
-    示例 (Example):
-        >>> trend = calculate_zhixing_short_trend(df, period=10)
-        >>> # EMA(EMA(C,10),10)
-    """
-    # 第一次 EMA
-    # First EMA
-    ema1 = calculate_ema(df, period=period, column=column)
-
-    # 创建临时 DataFrame 用于第二次 EMA 计算
-    # Create temporary DataFrame for second EMA calculation
-    temp_df = df.copy()
-    temp_df['__ema1__'] = ema1
-
-    # 第二次 EMA（对第一次 EMA 的结果再计算 EMA）
-    # Second EMA (apply EMA to the first EMA result)
-    trend = calculate_ema(temp_df, period=period, column='__ema1__')
-
+    """计算知行短期趋势线（双重 EMA）"""
+    ema1 = df[column].ewm(span=period, adjust=False).mean()
+    trend = ema1.ewm(span=period, adjust=False).mean()
     return trend
 
 
