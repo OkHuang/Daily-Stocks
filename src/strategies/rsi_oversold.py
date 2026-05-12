@@ -8,7 +8,7 @@ This module implements the Relative Strength Index (RSI) oversold strategy.
 import pandas as pd
 from typing import Dict, Any
 from .base import Strategy, StrategyMixin
-from ..utils.indicators import calculate_rsi
+from utils.indicators import calculate_rsi
 
 
 class RSIOversoldStrategy(Strategy, StrategyMixin):
