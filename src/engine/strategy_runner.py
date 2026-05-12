@@ -11,7 +11,7 @@ import yaml
 from pathlib import Path
 import os
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from strategies.base import Strategy
 from strategies.ma_cross import MACrossStrategy
@@ -19,6 +19,31 @@ from strategies.rsi_oversold import RSIOversoldStrategy
 from strategies.multi_indicator_combo import MultiIndicatorComboStrategy, LowVolatilityBullishStrategy
 from strategies.zhixing_trend_strategy import ZhixingTrendStrategy
 from utils.indicators import calculate_ma, calculate_ema, calculate_rsi, calculate_macd, calculate_kdj
+
+
+def _worker_process_stock(stock_code: str, df_data: pd.DataFrame, config_path: str) -> Dict[str, float]:
+    """子进程入口：对单只股票执行所有策略"""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+
+    if df_data is None or len(df_data) < 50:
+        return {}
+
+    from engine.strategy_runner import StrategyRunner
+    runner = StrategyRunner(config_path=config_path)
+    runner._precompute_indicators(df_data)
+
+    signals = {}
+    for strategy_name, strategy in runner.strategies.items():
+        try:
+            signal = strategy.get_latest_signal(df_data)
+            if signal > 0:
+                signals[strategy_name] = signal
+        except Exception:
+            pass
+
+    return signals
 
 
 class StrategyRunner:
@@ -42,8 +67,20 @@ class StrategyRunner:
         self.config_path = config_path
         self.strategies: Dict[str, Strategy] = {}
         self.logger = logger or logging.getLogger(__name__)
-        self._indicator_cache = {}  # 技术指标缓存 (Technical indicator cache)
         self._load_strategies()
+
+    def _preload_stock_data(self, stock_list: List[str], local_store) -> Dict[str, pd.DataFrame]:
+        """在主进程中预加载所有股票数据"""
+        stock_data = {}
+        for stock_code in stock_list:
+            try:
+                df = local_store.load_daily_data(stock_code)
+                if df is not None and len(df) >= 50:
+                    stock_data[stock_code] = df
+            except Exception as e:
+                self.logger.warning(f"加载 {stock_code} 数据失败: {e}")
+        self.logger.info(f"预加载了 {len(stock_data)}/{len(stock_list)} 只股票的数据")
+        return stock_data
 
     def _load_strategies(self):
         """
@@ -157,102 +194,41 @@ class StrategyRunner:
         local_store,
         fetcher
     ) -> Dict[str, Dict[str, float]]:
-        """
-        执行所有策略
-        Execute all strategies
+        """执行所有策略（多进程并行）"""
+        # 1. 在主进程预加载所有数据
+        self.logger.info("预加载股票数据...")
+        stock_data = self._preload_stock_data(stock_list, local_store)
 
-        对每只股票应用所有已启用的策略，计算信号。
-        Applies all enabled strategies to each stock and calculates signals.
+        if not stock_data:
+            self.logger.warning("没有足够的股票数据可供分析")
+            return {}
 
-        参数 (Parameters):
-            stock_list: 股票代码列表 (List of stock codes)
-            local_store: 本地存储实例 (Local storage instance)
-            fetcher: 数据获取器实例 (Data fetcher instance)
-
-        返回 (Returns):
-            Dict[str, Dict[str, float]]: 策略执行结果 (Strategy execution results):
-                - 外层字典键: 股票代码 (Outer dict key: stock code)
-                - 内层字典键: 策略名称 (Inner dict key: strategy name)
-                - 内层字典值: 信号强度 (Inner dict value: signal strength)
-        """
+        # 2. 多进程执行
         results = {}
-
-        # 根据系统资源动态调整线程数
-        # Dynamically adjust thread count based on system resources
         cpu_count = os.cpu_count() or 1
-        max_workers = min(len(stock_list), cpu_count * 2)
+        max_workers = min(cpu_count, 4)
 
-        self.logger.info(f"Using {max_workers} workers for {len(stock_list)} stocks")
+        self.logger.info(f"使用 {max_workers} 个进程处理 {len(stock_data)} 只股票")
 
-        # 使用线程池并发执行策略
-        # Use thread pool to execute strategies concurrently
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = {
-                executor.submit(self._run_single_stock, stock_code, local_store, fetcher): stock_code
-                for stock_code in stock_list
+                executor.submit(
+                    _worker_process_stock,
+                    stock_code,
+                    df,
+                    self.config_path
+                ): stock_code
+                for stock_code, df in stock_data.items()
             }
 
             for future in as_completed(futures):
                 stock_code = futures[future]
                 try:
-                    # 添加超时控制，防止任务卡死
-                    # Add timeout control to prevent tasks from hanging
-                    stock_results = future.result(timeout=30)
+                    stock_results = future.result(timeout=60)
                     if stock_results:
                         results[stock_code] = stock_results
                 except Exception as e:
-                    self.logger.error(f"Error processing {stock_code}: {e}")
+                    self.logger.error(f"处理 {stock_code} 时出错: {e}")
 
-        self.logger.info(f"Strategy execution completed: {len(results)} stocks processed")
+        self.logger.info(f"策略执行完成: {len(results)} 只股票产生信号")
         return results
-
-    def _run_single_stock(
-        self,
-        stock_code: str,
-        local_store,
-        fetcher
-    ) -> Dict[str, float]:
-        """
-        对单只股票执行所有策略
-        Execute all strategies for a single stock
-
-        参数 (Parameters):
-            stock_code: 股票代码 (Stock code)
-            local_store: 本地存储实例 (Local storage instance)
-            fetcher: 数据获取器实例 (Data fetcher instance)
-
-        返回 (Returns):
-            Dict[str, float]: 策略信号字典 (Strategy signal dictionary)
-        """
-        # 清空指标缓存（每只股票独立计算）
-        # Clear indicator cache (independent calculation per stock)
-        self._indicator_cache.clear()
-
-        # 1. 尝试从本地加载数据
-        # 1. Try to load data from local storage
-        df = local_store.load_daily_data(stock_code)
-
-        # 2. 如果本地数据不足，从数据源获取
-        # 2. Fetch from data source if local data is insufficient
-        if df is None or len(df) < 50:
-            df = fetcher.fetch_daily(stock_code)
-            if df is not None and len(df) > 0:
-                local_store.save_daily_data(df)
-
-        # 3. 预计算技术指标（避免重复计算）
-        # 3. Precompute technical indicators (avoid repeated calculations)
-        if df is not None and len(df) >= 50:
-            df = self._precompute_indicators(df)
-
-        # 4. 执行所有策略
-        # 4. Execute all strategies
-        signals = {}
-        for strategy_name, strategy in self.strategies.items():
-            try:
-                signal = strategy.get_latest_signal(df)
-                if signal > 0:
-                    signals[strategy_name] = signal
-            except Exception as e:
-                self.logger.error(f"Error in {strategy_name} for {stock_code}: {e}")
-
-        return signals
