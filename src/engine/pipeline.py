@@ -134,15 +134,8 @@ class Pipeline:
             stock_list = self.stock_pool.get_stock_list()
             self.logger.info(f"Total stocks in pool: {len(stock_list)}")
 
-            # 2. 更新本地数据
-            # 2. Update local data
-            self.logger.info("Updating local data...")
+            # 2. 初始化数据库表结构（数据更新由 collect.py 负责）
             self.local_store._init_tables()
-            update_stats = self.local_store.update_daily_data(stock_list)
-            self.logger.info(
-                f"Data update completed: {update_stats['success']} success, "
-                f"{update_stats['failed']} failed"
-            )
 
             # 3. 执行策略
             # 3. Execute strategies
