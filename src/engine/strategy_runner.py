@@ -16,6 +16,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from strategies.base import Strategy
 from strategies.ma_cross import MACrossStrategy
 from strategies.rsi_oversold import RSIOversoldStrategy
+from strategies.multi_indicator_combo import MultiIndicatorComboStrategy, LowVolatilityBullishStrategy
+from strategies.zhixing_trend_strategy import ZhixingTrendStrategy
 from utils.indicators import calculate_ma, calculate_ema, calculate_rsi, calculate_macd, calculate_kdj
 
 
@@ -65,6 +67,9 @@ class StrategyRunner:
         strategy_registry = {
             'ma_cross': MACrossStrategy,
             'rsi_oversold': RSIOversoldStrategy,
+            'multi_indicator_combo': MultiIndicatorComboStrategy,
+            'low_volatility_bullish': LowVolatilityBullishStrategy,
+            'zhixing_trend': ZhixingTrendStrategy,
         }
 
         # 实例化已启用的策略
