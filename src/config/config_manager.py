@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 import logging
 
+from dotenv import load_dotenv
 from data.exceptions import ConfigurationError
 
 
@@ -47,6 +48,10 @@ class ConfigManager:
             config_path = Path(__file__).parent.parent.parent / "settings.yaml"
 
         config_path = Path(config_path)
+
+        # 加载 .env 文件中的环境变量
+        env_path = config_path.parent / ".env"
+        load_dotenv(env_path)
 
         if not config_path.exists():
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
@@ -144,15 +149,13 @@ class ConfigManager:
             token = config['data_source']['token']
         except (KeyError, TypeError):
             raise ConfigurationError(
-                "Tushare Token not configured. "
-                "Please set TUSHARE_TOKEN environment variable or configure it in settings.yaml",
+                "Tushare Token 未配置。请设置 TUSHARE_TOKEN 环境变量或在 .env 文件中配置",
                 'data_source.token'
             )
 
         if not token or token == 'YOUR_TOKEN_HERE':
             raise ConfigurationError(
-                "Tushare Token not configured. "
-                "Please set TUSHARE_TOKEN environment variable or configure it in settings.yaml",
+                "Tushare Token 未配置。请设置 TUSHARE_TOKEN 环境变量或在 .env 文件中配置",
                 'data_source.token'
             )
 
