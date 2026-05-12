@@ -12,7 +12,7 @@ from typing import Dict, Any, Optional
 import logging
 
 from dotenv import load_dotenv
-from data.exceptions import ConfigurationError
+from src.data.exceptions import ConfigurationError
 
 
 class ConfigManager:

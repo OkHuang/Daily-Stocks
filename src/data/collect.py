@@ -23,7 +23,6 @@
 
 import sys
 import argparse
-import yaml
 import logging
 from pathlib import Path
 from typing import Optional
@@ -37,17 +36,7 @@ from src.data.fetcher import TushareFetcher
 from src.data.local_store import LocalStore
 from src.data.stock_pool import StockPool
 from src.utils.logger import setup_logger
-
-
-def load_config(config_path: str = None) -> dict:
-    """加载配置文件"""
-    if config_path is None:
-        config_path = project_root / "settings.yaml"
-
-    with open(config_path, 'r', encoding='utf-8') as f:
-        config = yaml.safe_load(f)
-
-    return config
+from src.config.config_manager import ConfigManager
 
 
 def collect_full(
@@ -446,7 +435,7 @@ def main():
     args = parser.parse_args()
 
     # 加载配置
-    config = load_config(args.config)
+    config = ConfigManager.load_and_validate(args.config)
     token = config['data_source']['token']
     db_path = config['storage']['path']
 
