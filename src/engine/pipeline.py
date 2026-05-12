@@ -29,7 +29,7 @@ class Pipeline:
         self.local_store = LocalStore(db_path=config['storage']['path'])
         self.stock_pool = StockPool(
             source=config['stock_pool']['source'],
-            custom_file=config['stock_pool'].get('custom_list')
+            token=self._get_token(config)
         )
         self.strategy_runner = StrategyRunner(config.get('strategies_config'))
         self.signal_aggregator = SignalAggregator()
@@ -59,6 +59,11 @@ class Pipeline:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._cleanup_resources()
         return False
+
+    def _get_token(self, config: Dict[str, Any]) -> str:
+        """从配置获取 Tushare Token"""
+        from config.config_manager import ConfigManager
+        return ConfigManager.get_token(config)
 
     def _init_fetcher(self) -> BaseFetcher:
         provider = self.config['data_source']['provider']

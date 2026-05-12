@@ -1,7 +1,6 @@
 # 数据收集系统使用指南
-# Data Collection System User Guide
 
-## 目录 (Table of Contents)
+## 目录
 
 1. [系统概述](#系统概述)
 2. [前置准备](#前置准备)
@@ -84,12 +83,10 @@ pip install tushare pandas pyyaml akshare
 
 1. 访问 [Tushare Pro](https://tushare.pro) 注册账号
 2. 获取 API Token
-3. 编辑项目根目录下的 `settings.yaml` 文件：
+3. 在项目根目录创建 `.env` 文件：
 
-```yaml
-data_source:
-  provider: "tushare"
-  token: "你的Tushare Token"  # 替换为你的Token
+```
+TUSHARE_TOKEN=你的Token
 ```
 
 ### 4. 目录结构
@@ -605,6 +602,5 @@ python -m src.data.collect --mode full --source csi300 --start 20130101
 
 ---
 
-**文档版本：** v2.0
-**最后更新：** 2026-02-19
-**维护者：** Stock Picker System Team
+**文档版本：** v3.0
+**最后更新：** 2026-05-13

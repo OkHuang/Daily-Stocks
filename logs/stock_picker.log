@@ -16732,3 +16732,31 @@
 2026-04-01 23:02:32 - stock_picker - INFO - Tushare API initialized
 2026-04-01 23:02:32 - stock_picker - ERROR - 获取A股列表失败: 抱歉，您每小时最多访问该接口1次，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。
 2026-04-01 23:02:32 - stock_picker - ERROR - 获取股票列表失败
+2026-05-12 23:46:19 - stock_picker - INFO - ============================================================
+2026-05-12 23:46:19 - stock_picker - INFO - 股票收盘选股系统启动
+2026-05-12 23:46:19 - stock_picker - INFO - ============================================================
+2026-05-12 23:46:19 - stock_picker - INFO - 配置文件: settings.yaml
+2026-05-12 23:46:19 - stock_picker - INFO - 运行日期: 最新交易日
+2026-05-12 23:46:19 - stock_picker - INFO - 日志级别: INFO
+2026-05-12 23:46:19 - stock_picker - INFO - ============================================================
+2026-05-12 23:56:49 - stock_picker - INFO - ============================================================
+2026-05-12 23:56:49 - stock_picker - INFO - 股票收盘选股系统启动
+2026-05-12 23:56:49 - stock_picker - INFO - ============================================================
+2026-05-12 23:56:49 - stock_picker - INFO - 配置文件: settings.yaml
+2026-05-12 23:56:49 - stock_picker - INFO - 运行日期: 最新交易日
+2026-05-12 23:56:49 - stock_picker - INFO - 日志级别: INFO
+2026-05-12 23:56:49 - stock_picker - INFO - ============================================================
+2026-05-12 23:56:49 - stock_picker - INFO - Starting stock selection pipeline...
+2026-05-12 23:56:49 - stock_picker - INFO - Fetching stock pool...
+2026-05-12 23:56:49 - stock_picker - INFO - Total stocks in pool: 5515
+2026-05-12 23:56:49 - stock_picker - INFO - Executing strategies...
+2026-05-12 23:56:54 - stock_picker - INFO - Aggregating signals...
+2026-05-12 23:56:54 - stock_picker - INFO - Outputting results...
+2026-05-12 23:56:54 - stock_picker - INFO - Results saved to: reports\20260512_result.csv
+2026-05-12 23:56:55 - stock_picker - INFO - Results saved to: reports\20260512_result.xlsx
+2026-05-12 23:56:55 - stock_picker - INFO - Pipeline completed successfully!
+2026-05-12 23:56:55 - stock_picker - INFO - All resources cleaned up
+2026-05-12 23:56:55 - stock_picker - INFO - ============================================================
+2026-05-12 23:56:55 - stock_picker - INFO - 选股流程完成
+2026-05-12 23:56:55 - stock_picker - INFO - 候选股票数量: 9
+2026-05-12 23:56:55 - stock_picker - INFO - ============================================================

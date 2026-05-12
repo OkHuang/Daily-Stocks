@@ -235,6 +235,5 @@ latest_signal = strategy.get_latest_signal(df)
 
 ---
 
-**文档版本**: v1.0
-**创建日期**: 2026-02-20
-**维护者**: Stock Picker System Team
+**文档版本**: v1.1
+**最后更新**: 2026-05-13

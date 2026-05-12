@@ -1,5 +1,6 @@
 # 敏感配置
 .env
+.env.*
 
 # Python
 __pycache__/
@@ -20,6 +21,9 @@ env/
 .idea/
 *.swp
 *.swo
+
+# Claude Code
+.claude/
 
 # 数据和日志
 database/
