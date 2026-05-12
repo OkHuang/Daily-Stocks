@@ -4,7 +4,7 @@
 # 数据源配置
 data_source:
   provider: "tushare"  # 数据源提供商: tushare/akshare/baostock
-  token: "3a49fed93eac19b95afa00647181659b803b5679a2cde87c4ea92fe2"  # Tushare Pro Token，请在 https://tushare.pro 注册获取
+  token: null  # 从 .env 文件或环境变量 TUSHARE_TOKEN 读取
 
   # API 请求配置
   api:

@@ -7,6 +7,7 @@ numpy>=1.21.0
 
 # 配置文件处理 (Configuration file handling)
 pyyaml>=5.4.0
+python-dotenv>=1.0.0
 
 # 数据源 (Data source)
 tushare>=1.2.0
