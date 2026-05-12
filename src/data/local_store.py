@@ -524,66 +524,50 @@ class LocalStore:
             result['errors'].append(f"数据类型转换失败 (Data type conversion failed): {e}")
             return result
 
-        # 逐行验证数据
-        # Validate data row by row
-        for idx, row in df.iterrows():
-            record_errors = []
+        # 向量化数据验证
+        price_cols = ['open', 'high', 'low', 'close']
+        volume_cols = ['vol', 'amount']
+        all_cols = price_cols + volume_cols
 
-            # 检查价格是否为负数（只检查负数，NaN 值在后续单独处理）
-            # Check if prices are negative (NaN values are handled separately)
-            if not pd.isna(row['open']) and row['open'] < 0:
-                record_errors.append(f"第 {idx} 行: open 价格为负数 (Negative open price)")
-            if not pd.isna(row['high']) and row['high'] < 0:
-                record_errors.append(f"第 {idx} 行: high 价格为负数 (Negative high price)")
-            if not pd.isna(row['low']) and row['low'] < 0:
-                record_errors.append(f"第 {idx} 行: low 价格为负数 (Negative low price)")
-            if not pd.isna(row['close']) and row['close'] < 0:
-                record_errors.append(f"第 {idx} 行: close 价格为负数 (Negative close price)")
+        # 负数检查
+        neg_mask = df[all_cols] < 0
+        for col in all_cols:
+            neg_count = neg_mask[col].sum()
+            if neg_count > 0:
+                result['errors'].append(f"{col} 存在 {neg_count} 行负数值")
+                result['stats']['invalid_records'] += neg_count
 
-            # 检查成交量和成交额是否为负数（只检查负数，NaN 值在后续单独处理）
-            # Check if volume and amount are negative (NaN values are handled separately)
-            if not pd.isna(row['vol']) and row['vol'] < 0:
-                record_errors.append(f"第 {idx} 行: vol 成交量为负数 (Negative volume)")
-            if not pd.isna(row['amount']) and row['amount'] < 0:
-                record_errors.append(f"第 {idx} 行: amount 成交额为负数 (Negative amount)")
+        if result['errors']:
+            result['is_valid'] = False
 
-            # 检查价格逻辑关系：high >= low, high >= open, high >= close, low <= open, low <= close
-            # Check price logic: high >= low, high >= open, high >= close, low <= open, low <= close
-            try:
-                if not pd.isna(row['high']) and not pd.isna(row['low']):
-                    if row['high'] < row['low']:
-                        record_errors.append(f"第 {idx} 行: high < low，价格逻辑错误 (Price logic error: high < low)")
-                if not pd.isna(row['high']) and not pd.isna(row['open']):
-                    if row['high'] < row['open']:
-                        record_errors.append(f"第 {idx} 行: high < open，价格逻辑错误 (Price logic error: high < open)")
-                if not pd.isna(row['high']) and not pd.isna(row['close']):
-                    if row['high'] < row['close']:
-                        record_errors.append(f"第 {idx} 行: high < close，价格逻辑错误 (Price logic error: high < close)")
-                if not pd.isna(row['low']) and not pd.isna(row['open']):
-                    if row['low'] > row['open']:
-                        record_errors.append(f"第 {idx} 行: low > open，价格逻辑错误 (Price logic error: low > open)")
-                if not pd.isna(row['low']) and not pd.isna(row['close']):
-                    if row['low'] > row['close']:
-                        record_errors.append(f"第 {idx} 行: low > close，价格逻辑错误 (Price logic error: low > close)")
-            except Exception as e:
-                record_errors.append(f"第 {idx} 行: 价格逻辑检查失败 (Price logic check failed): {e}")
+        # 价格逻辑检查（排除含 NaN 的行）
+        valid_mask = df[price_cols].notna().all(axis=1)
+        df_valid = df[valid_mask]
 
-            # 检查缺失值（可能是停牌期间的正常现象）
-            # Check missing values (normal during suspension periods)
-            missing_count = sum(1 for col in ['open', 'high', 'low', 'close', 'vol', 'amount'] if pd.isna(row[col]))
-            if missing_count > 0:
-                result['stats']['missing_values'] += missing_count
-                # 对于 NaN 值，只记录警告（可能是停牌）
-                # For NaN values, only record warning (possibly suspended)
-                if missing_count == 6:  # 所有字段都是 NaN
-                    result['warnings'].append(f"第 {idx} 行 (日期: {row.get('trade_date', 'N/A')}): 所有字段为空（可能停牌，Suspended trading）")
-                elif missing_count > 0:
-                    result['warnings'].append(f"第 {idx} 行 (日期: {row.get('trade_date', 'N/A')}): 有 {missing_count} 个字段为空")
-
-            if record_errors:
+        logic_checks = [
+            (df_valid['high'] < df_valid['low'], "high < low"),
+            (df_valid['high'] < df_valid['open'], "high < open"),
+            (df_valid['high'] < df_valid['close'], "high < close"),
+            (df_valid['low'] > df_valid['open'], "low > open"),
+            (df_valid['low'] > df_valid['close'], "low > close"),
+        ]
+        for mask, desc in logic_checks:
+            error_count = mask.sum()
+            if error_count > 0:
                 result['is_valid'] = False
-                result['errors'].extend(record_errors)
-                result['stats']['invalid_records'] += 1
+                result['errors'].append(f"{error_count} 行价格逻辑错误: {desc}")
+                result['stats']['invalid_records'] += error_count
+
+        # 缺失值统计
+        missing_per_row = df[all_cols].isna().sum(axis=1)
+        all_nan_count = (missing_per_row == len(all_cols)).sum()
+        partial_nan_count = ((missing_per_row > 0) & (missing_per_row < len(all_cols))).sum()
+        result['stats']['missing_values'] = int(missing_per_row.sum())
+
+        if all_nan_count > 0:
+            result['warnings'].append(f"{all_nan_count} 行所有字段为空（可能停牌）")
+        if partial_nan_count > 0:
+            result['warnings'].append(f"{partial_nan_count} 行部分字段为空")
 
         # 检查是否有重复记录（同一股票同一日期）
         # Check for duplicate records (same stock same date)
