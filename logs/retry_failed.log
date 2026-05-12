@@ -1,0 +1,148 @@
+2026-02-18 01:16:25 - stock_picker - INFO - 从文件读取股票代码: D:\Stock\stock_picker\stock_code\failed_stocks.txt
+2026-02-18 01:16:25 - stock_picker - INFO - 成功读取 20 只股票
+2026-02-18 01:16:25 - stock_picker - INFO - ============================================================
+2026-02-18 01:16:25 - stock_picker - INFO - 开始全量数据收集
+2026-02-18 01:16:25 - stock_picker - INFO - Starting Full Data Collection
+2026-02-18 01:16:25 - stock_picker - INFO - ============================================================
+2026-02-18 01:16:25 - stock_picker - INFO - 结束日期 (End date): 20260217
+2026-02-18 01:16:25 - stock_picker - INFO - 时间范围 (Date range): 20130101 - 20260217
+2026-02-18 01:16:25 - stock_picker - INFO - 说明 (Note): 将覆盖数据库中的全部历史数据
+
+2026-02-18 01:16:25 - stock_picker - INFO - Starting batch update for 5 stocks
+2026-02-18 01:16:25 - stock_picker - INFO - [1/5] Updating 300308.SZ...
+2026-02-18 01:16:26 - stock_picker - INFO - Tushare API initialized
+2026-02-18 01:16:26 - stock_picker - INFO - Successfully fetched 3018 records for 300308.SZ
+2026-02-18 01:16:26 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:16:26 - stock_picker - INFO - Saved 3018 records, 0 failed
+2026-02-18 01:16:26 - stock_picker - INFO -   ✓ Saved 3018 records
+2026-02-18 01:16:26 - stock_picker - INFO - [2/5] Updating 600372.SH...
+2026-02-18 01:16:27 - stock_picker - INFO - Successfully fetched 3159 records for 600372.SH
+2026-02-18 01:16:27 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:16:27 - stock_picker - INFO - Saved 3159 records, 0 failed
+2026-02-18 01:16:27 - stock_picker - INFO -   ✓ Saved 3159 records
+2026-02-18 01:16:27 - stock_picker - INFO - [3/5] Updating 600938.SH...
+2026-02-18 01:16:27 - stock_picker - INFO - Successfully fetched 929 records for 600938.SH
+2026-02-18 01:16:27 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:16:28 - stock_picker - INFO - Saved 929 records, 0 failed
+2026-02-18 01:16:28 - stock_picker - INFO -   ✓ Saved 929 records
+2026-02-18 01:16:28 - stock_picker - INFO - [4/5] Updating 688256.SH...
+2026-02-18 01:16:28 - stock_picker - INFO - Successfully fetched 1355 records for 688256.SH
+2026-02-18 01:16:28 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:16:28 - stock_picker - INFO - Saved 1355 records, 0 failed
+2026-02-18 01:16:28 - stock_picker - INFO -   ✓ Saved 1355 records
+2026-02-18 01:16:28 - stock_picker - INFO - [5/5] Updating 301269.SZ...
+2026-02-18 01:16:28 - stock_picker - INFO - Successfully fetched 852 records for 301269.SZ
+2026-02-18 01:16:28 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:16:28 - stock_picker - INFO - Saved 852 records, 0 failed
+2026-02-18 01:16:28 - stock_picker - INFO -   ✓ Saved 852 records
+2026-02-18 01:16:28 - stock_picker - INFO - Batch update completed: {'total': 5, 'success': 5, 'failed': 0, 'total_records': 9313, 'failed_stocks': []}
+2026-02-18 01:16:28 - stock_picker - INFO - 
+============================================================
+2026-02-18 01:16:28 - stock_picker - INFO - 全量数据收集完成
+2026-02-18 01:16:28 - stock_picker - INFO - Full Data Collection Completed
+2026-02-18 01:16:28 - stock_picker - INFO - 总股票数 (Total): 5
+2026-02-18 01:16:28 - stock_picker - INFO - 成功 (Success): 5
+2026-02-18 01:16:28 - stock_picker - INFO - 失败 (Failed): 0
+2026-02-18 01:16:28 - stock_picker - INFO - 总记录数 (Total records): 9313
+2026-02-18 01:16:28 - stock_picker - INFO - ============================================================
+2026-02-18 01:16:28 - stock_picker - INFO - 已删除失败股票文件: D:\Stock\stock_picker\stock_code\failed_stocks.txt
+2026-02-18 01:16:28 - stock_picker - INFO - Database connection closed
+2026-02-18 01:18:33 - stock_picker - INFO - 从文件读取股票代码: D:\Stock\stock_picker\stock_code\failed_stocks.txt
+2026-02-18 01:18:33 - stock_picker - INFO - 成功读取 15 只股票
+2026-02-18 01:18:33 - stock_picker - INFO - ============================================================
+2026-02-18 01:18:33 - stock_picker - INFO - 开始全量数据收集
+2026-02-18 01:18:33 - stock_picker - INFO - Starting Full Data Collection
+2026-02-18 01:18:33 - stock_picker - INFO - ============================================================
+2026-02-18 01:18:33 - stock_picker - INFO - 结束日期 (End date): 20260217
+2026-02-18 01:18:33 - stock_picker - INFO - 时间范围 (Date range): 20130101 - 20260217
+2026-02-18 01:18:33 - stock_picker - INFO - 说明 (Note): 将覆盖数据库中的全部历史数据
+
+2026-02-18 01:18:33 - stock_picker - INFO - Starting batch update for 15 stocks
+2026-02-18 01:18:33 - stock_picker - INFO - [1/15] Updating 605499.SH...
+2026-02-18 01:18:33 - stock_picker - INFO - Tushare API initialized
+2026-02-18 01:18:34 - stock_picker - INFO - Successfully fetched 1148 records for 605499.SH
+2026-02-18 01:18:34 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:34 - stock_picker - INFO - Saved 1148 records, 0 failed
+2026-02-18 01:18:34 - stock_picker - INFO -   ✓ Saved 1148 records
+2026-02-18 01:18:34 - stock_picker - INFO - [2/15] Updating 688396.SH...
+2026-02-18 01:18:34 - stock_picker - INFO - Successfully fetched 1451 records for 688396.SH
+2026-02-18 01:18:34 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:34 - stock_picker - INFO - Saved 1451 records, 0 failed
+2026-02-18 01:18:34 - stock_picker - INFO -   ✓ Saved 1451 records
+2026-02-18 01:18:34 - stock_picker - INFO - [3/15] Updating 688126.SH...
+2026-02-18 01:18:34 - stock_picker - INFO - Successfully fetched 1405 records for 688126.SH
+2026-02-18 01:18:34 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:35 - stock_picker - INFO - Saved 1405 records, 0 failed
+2026-02-18 01:18:35 - stock_picker - INFO -   ✓ Saved 1405 records
+2026-02-18 01:18:35 - stock_picker - INFO - [4/15] Updating 688111.SH...
+2026-02-18 01:18:35 - stock_picker - INFO - Successfully fetched 1517 records for 688111.SH
+2026-02-18 01:18:35 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:35 - stock_picker - INFO - Saved 1517 records, 0 failed
+2026-02-18 01:18:35 - stock_picker - INFO -   ✓ Saved 1517 records
+2026-02-18 01:18:35 - stock_picker - INFO - [5/15] Updating 601995.SH...
+2026-02-18 01:18:35 - stock_picker - INFO - Successfully fetched 1266 records for 601995.SH
+2026-02-18 01:18:35 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:36 - stock_picker - INFO - Saved 1266 records, 0 failed
+2026-02-18 01:18:36 - stock_picker - INFO -   ✓ Saved 1266 records
+2026-02-18 01:18:36 - stock_picker - INFO - [6/15] Updating 601808.SH...
+2026-02-18 01:18:36 - stock_picker - INFO - Successfully fetched 3187 records for 601808.SH
+2026-02-18 01:18:36 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:36 - stock_picker - INFO - Saved 3187 records, 0 failed
+2026-02-18 01:18:36 - stock_picker - INFO -   ✓ Saved 3187 records
+2026-02-18 01:18:36 - stock_picker - INFO - [7/15] Updating 600176.SH...
+2026-02-18 01:18:37 - stock_picker - INFO - Successfully fetched 3165 records for 600176.SH
+2026-02-18 01:18:37 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:37 - stock_picker - INFO - Saved 3165 records, 0 failed
+2026-02-18 01:18:37 - stock_picker - INFO -   ✓ Saved 3165 records
+2026-02-18 01:18:37 - stock_picker - INFO - [8/15] Updating 600438.SH...
+2026-02-18 01:18:38 - stock_picker - INFO - Successfully fetched 3045 records for 600438.SH
+2026-02-18 01:18:38 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:38 - stock_picker - INFO - Saved 3045 records, 0 failed
+2026-02-18 01:18:38 - stock_picker - INFO -   ✓ Saved 3045 records
+2026-02-18 01:18:38 - stock_picker - INFO - [9/15] Updating 600809.SH...
+2026-02-18 01:18:38 - stock_picker - INFO - Successfully fetched 3175 records for 600809.SH
+2026-02-18 01:18:38 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:39 - stock_picker - INFO - Saved 3175 records, 0 failed
+2026-02-18 01:18:39 - stock_picker - INFO -   ✓ Saved 3175 records
+2026-02-18 01:18:39 - stock_picker - INFO - [10/15] Updating 002241.SZ...
+2026-02-18 01:18:39 - stock_picker - INFO - Successfully fetched 3173 records for 002241.SZ
+2026-02-18 01:18:39 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:40 - stock_picker - INFO - Saved 3173 records, 0 failed
+2026-02-18 01:18:40 - stock_picker - INFO -   ✓ Saved 3173 records
+2026-02-18 01:18:40 - stock_picker - INFO - [11/15] Updating 601336.SH...
+2026-02-18 01:18:40 - stock_picker - INFO - Successfully fetched 3162 records for 601336.SH
+2026-02-18 01:18:40 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:40 - stock_picker - INFO - Saved 3162 records, 0 failed
+2026-02-18 01:18:40 - stock_picker - INFO -   ✓ Saved 3162 records
+2026-02-18 01:18:40 - stock_picker - INFO - [12/15] Updating 601633.SH...
+2026-02-18 01:18:41 - stock_picker - INFO - Successfully fetched 3164 records for 601633.SH
+2026-02-18 01:18:41 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:41 - stock_picker - INFO - Saved 3164 records, 0 failed
+2026-02-18 01:18:41 - stock_picker - INFO -   ✓ Saved 3164 records
+2026-02-18 01:18:41 - stock_picker - INFO - [13/15] Updating 600690.SH...
+2026-02-18 01:18:41 - stock_picker - INFO - Successfully fetched 3096 records for 600690.SH
+2026-02-18 01:18:41 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:42 - stock_picker - INFO - Saved 3096 records, 0 failed
+2026-02-18 01:18:42 - stock_picker - INFO -   ✓ Saved 3096 records
+2026-02-18 01:18:42 - stock_picker - INFO - [14/15] Updating 600660.SH...
+2026-02-18 01:18:42 - stock_picker - INFO - Successfully fetched 3187 records for 600660.SH
+2026-02-18 01:18:42 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:43 - stock_picker - INFO - Saved 3187 records, 0 failed
+2026-02-18 01:18:43 - stock_picker - INFO -   ✓ Saved 3187 records
+2026-02-18 01:18:43 - stock_picker - INFO - [15/15] Updating 600585.SH...
+2026-02-18 01:18:43 - stock_picker - INFO - Successfully fetched 3179 records for 600585.SH
+2026-02-18 01:18:43 - stock_picker - INFO - Database tables initialized
+2026-02-18 01:18:44 - stock_picker - INFO - Saved 3179 records, 0 failed
+2026-02-18 01:18:44 - stock_picker - INFO -   ✓ Saved 3179 records
+2026-02-18 01:18:44 - stock_picker - INFO - Batch update completed: {'total': 15, 'success': 15, 'failed': 0, 'total_records': 38320, 'failed_stocks': []}
+2026-02-18 01:18:44 - stock_picker - INFO - 
+============================================================
+2026-02-18 01:18:44 - stock_picker - INFO - 全量数据收集完成
+2026-02-18 01:18:44 - stock_picker - INFO - Full Data Collection Completed
+2026-02-18 01:18:44 - stock_picker - INFO - 总股票数 (Total): 15
+2026-02-18 01:18:44 - stock_picker - INFO - 成功 (Success): 15
+2026-02-18 01:18:44 - stock_picker - INFO - 失败 (Failed): 0
+2026-02-18 01:18:44 - stock_picker - INFO - 总记录数 (Total records): 38320
+2026-02-18 01:18:44 - stock_picker - INFO - ============================================================
+2026-02-18 01:18:44 - stock_picker - INFO - 已删除失败股票文件: D:\Stock\stock_picker\stock_code\failed_stocks.txt
+2026-02-18 01:18:44 - stock_picker - INFO - Database connection closed

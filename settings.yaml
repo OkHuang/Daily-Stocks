@@ -1,0 +1,55 @@
+# 股票收盘选股系统 - 全局配置文件
+# Stock Picker System - Global Configuration
+
+# 数据源配置
+data_source:
+  provider: "tushare"  # 数据源提供商: tushare/akshare/baostock
+  token: "3a49fed93eac19b95afa00647181659b803b5679a2cde87c4ea92fe2"  # Tushare Pro Token，请在 https://tushare.pro 注册获取
+
+  # API 请求配置
+  api:
+    max_retries: 3  # 最大重试次数
+    retry_delay: 2.0  # 重试延迟（秒）
+    request_delay: 0.3  # 请求间隔（秒），避免触发频率限制
+
+# 数据存储配置
+storage:
+  type: "sqlite"  # 存储类型: sqlite/parquet
+  path: "database/market_data.db"  # SQLite 数据库文件路径
+
+# 数据收集配置
+data_collection:
+  # 首次收集配置
+  initial:
+    strategy_type: "medium"  # 策略类型: short(60天)/medium(90天)/long(250天)
+    trading_days: 90  # 覆盖的交易日数量
+
+  # 日常增量更新配置
+  incremental:
+    enabled: true  # 是否启用增量更新
+    check_frequency: "daily"  # 检查频率: daily/weekly
+
+  # 时间范围缓冲（用于技术指标计算）
+  buffer_days: 10  # 额外缓冲的交易日数
+
+# 股票池配置
+stock_pool:
+  source: "all_a"  # 股票池来源: all_a(全部A股)/csi300(沪深300)/sz50(上证50)/custom(自定义)
+  custom_list: "custom_stocks.txt"  # 自定义股票列表文件路径
+
+# 日志配置
+logging:
+  level: "INFO"  # 日志级别: DEBUG/INFO/WARNING/ERROR/CRITICAL
+  file: "logs/stock_picker.log"  # 日志文件路径
+  console: true  # 是否输出到控制台
+
+# 输出配置
+output:
+  formats:  # 输出格式列表
+    - "csv"
+    - "excel"
+  path: "reports"  # 报告输出目录
+  top_n: 20  # 输出前N只股票
+
+# 策略配置文件路径
+strategies_config: "strategies.yaml"

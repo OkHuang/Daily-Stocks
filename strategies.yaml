@@ -1,0 +1,84 @@
+# 股票选股策略配置文件
+# Stock Selection Strategies Configuration
+
+strategies:
+  # 均线交叉策略
+  ma_cross:
+    enabled: true  # 是否启用该策略
+    params:
+      short_period: 5  # 短期均线周期
+      long_period: 20  # 长期均线周期
+      weight: 1.0  # 信号权重
+
+  # RSI 超卖策略
+  rsi_oversold:
+    enabled: true  # 是否启用该策略
+    params:
+      period: 14  # RSI 计算周期
+      threshold: 30  # 超卖阈值（低于此值视为超卖）
+      weight: 1.0  # 信号权重
+
+  # MACD 金叉策略
+  macd_cross:
+    enabled: false  # 默认禁用
+    params:
+      fast_period: 12  # 快线周期
+      slow_period: 26  # 慢线周期
+      signal_period: 9  # 信号线周期
+      weight: 1.0  # 信号权重
+
+  # 布林带突破策略
+  bollinger_breakout:
+    enabled: false  # 默认禁用
+    params:
+      period: 20  # 均线周期
+      std_dev: 2  # 标准差倍数
+      weight: 1.0  # 信号权重
+
+  # 多指标组合策略
+  multi_indicator_combo:
+    enabled: true  # 默认启用
+    params:
+      volatility_period: 60  # 波动率计算周期（天）
+      volatility_threshold: 100.0  # 波动幅度阈值（%）
+      bbi_p1: 3  # BBI第一条均线周期
+      bbi_p2: 6  # BBI第二条均线周期
+      bbi_p3: 12  # BBI第三条均线周期
+      bbi_p4: 24  # BBI第四条均线周期
+      bbi_rising_days: 3  # BBI持续上升天数
+      kdj_n_period: 9  # KDJ的N周期
+      kdj_m1_period: 3  # KDJ的M1周期
+      kdj_m2_period: 3  # KDJ的M2周期
+      j_threshold: -1  # J值阈值
+      macd_fast: 12  # MACD快线周期
+      macd_slow: 26  # MACD慢线周期
+      macd_signal: 9  # MACD信号线周期
+      weight: 1.0  # 信号权重
+
+  # 低波动多头策略（简化版）
+  low_volatility_bullish:
+    enabled: false  # 默认禁用
+    params:
+      volatility_period: 60
+      volatility_threshold: 100.0
+      bbi_rising_days: 3
+      j_threshold: -1
+      weight: 1.0
+
+  # 知行趋势策略
+  zhixing_trend:
+    enabled: true  # 默认启用
+    params:
+      zhixing_bb_p1: 14  # 知行多空线第一条均线周期
+      zhixing_bb_p2: 28  # 知行多空线第二条均线周期
+      zhixing_bb_p3: 57  # 知行多空线第三条均线周期
+      zhixing_bb_p4: 114  # 知行多空线第四条均线周期
+      short_trend_period: 10  # 知行短期趋势线周期
+      kdj_n_period: 9  # KDJ的N周期
+      kdj_m1_period: 3  # KDJ的M1周期
+      kdj_m2_period: 3  # KDJ的M2周期
+      j_threshold: 13  # J值阈值
+      amplitude_threshold: 4.0  # 振幅阈值（%）
+      volume_ma_period: 12  # 成交量均线周期
+      volume_ratio_threshold: 52.0  # 成交量比例阈值（%）
+      weight: 1.0  # 信号权重
