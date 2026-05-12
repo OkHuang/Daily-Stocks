@@ -10,7 +10,6 @@ This file is the main entry point of the system, responsible for parsing command
 
 import argparse
 import sys
-import yaml
 from pathlib import Path
 from datetime import datetime
 
@@ -18,32 +17,10 @@ from datetime import datetime
 # Add src to Python path
 sys.path.insert(0, str(Path(__file__).parent / 'src'))
 
+from config.config_manager import ConfigManager
+from data.exceptions import ConfigurationError
 from engine.pipeline import Pipeline
 from utils.logger import setup_logger
-
-
-def load_config(config_path: str) -> dict:
-    """
-    加载配置文件
-    Load configuration file
-
-    参数 (Parameters):
-        config_path: 配置文件路径 (Configuration file path)
-
-    返回 (Returns):
-        dict: 配置字典 (Configuration dictionary)
-
-    异常 (Raises):
-        FileNotFoundError: 配置文件不存在 (Configuration file not found)
-    """
-    config_file = Path(config_path)
-    if not config_file.exists():
-        raise FileNotFoundError(f"配置文件不存在: {config_path}")
-
-    with open(config_file, 'r', encoding='utf-8') as f:
-        config = yaml.safe_load(f)
-
-    return config
 
 
 def parse_arguments():
@@ -124,7 +101,7 @@ def main():
     try:
         # 加载配置文件
         # Load configuration file
-        config = load_config(args.config)
+        config = ConfigManager.load_and_validate(args.config)
 
         # 覆盖配置（如果指定了命令行参数）
         # Override configuration if command-line arguments are specified
@@ -135,12 +112,11 @@ def main():
             config['output']['top_n'] = args.top_n
 
         # 验证 Tushare Token
-        # Validate Tushare Token
-        token = config['data_source'].get('token', '')
-        if token == 'YOUR_TOKEN_HERE' or not token:
-            print("错误 (Error): 请在 settings.yaml 中配置有效的 Tushare Token")
-            print("Error: Please configure a valid Tushare Token in settings.yaml")
-            print("\n获取 Token (Get Token): https://tushare.pro")
+        try:
+            ConfigManager.get_token(config)
+        except ConfigurationError as e:
+            print(f"错误: {e}")
+            print("请在 .env 文件中设置 TUSHARE_TOKEN 或设置环境变量")
             sys.exit(1)
 
         # 初始化日志
@@ -154,10 +130,10 @@ def main():
         # 验证日期格式
         # Validate date format
         if args.date:
-            from utils.date_utils import validate_date_format
-            if not validate_date_format(args.date):
-                logger.error(f"日期格式错误 (Invalid date format): {args.date}")
-                logger.error("请使用 YYYYMMDD 格式 (Please use YYYYMMDD format)")
+            try:
+                datetime.strptime(args.date, '%Y%m%d')
+            except ValueError:
+                logger.error(f"日期格式错误: {args.date}，请使用 YYYYMMDD 格式")
                 sys.exit(1)
 
         # 打印启动信息
