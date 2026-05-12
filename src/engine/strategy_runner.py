@@ -146,8 +146,6 @@ class StrategyRunner:
         if '__precomputed__' in df.columns:
             return df
 
-        df = df.copy()
-
         n_before = len(df.columns)
 
         # 预计算常用指标
