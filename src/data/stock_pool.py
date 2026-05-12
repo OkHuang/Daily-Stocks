@@ -1,14 +1,4 @@
-"""
-股票池管理模块 - Stock Pool Management Module
-
-该模块负责获取和管理待选股票池。
-This module is responsible for managing the pool of stocks to be analyzed.
-
-数据来源 (Data Sources):
-    1. 全部A股：通过 Tushare API 获取
-    2. 指数成分股：从 stock_code 文件夹读取预生成的文件
-    3. 失败股票：从 stock_code/failed_stocks.txt 读取
-"""
+"""股票池管理，支持全A股、指数成分股和失败股票列表"""
 
 from typing import List, Union
 from pathlib import Path
@@ -16,21 +6,7 @@ import logging
 
 
 class StockPool:
-    """
-    股票池管理类
-    Stock pool manager
-
-    支持的股票来源:
-    - 'all_a': 全部A股（通过 Tushare API 获取）
-    - 'csi300': 沪深300（从 stock_code/csi300.txt 读取）
-    - 'sse50': 上证50（从 stock_code/sse50.txt 读取）
-    - 'csi500': 中证500（从 stock_code/csi500.txt 读取）
-    - 'csi1000': 中证1000（从 stock_code/csi1000.txt 读取）
-    - 'sz50': 深证50（从 stock_code/sz50.txt 读取）
-    - 'cyb50': 创业板50（从 stock_code/cyb50.txt 读取）
-    - 'star50': 科创50（从 stock_code/star50.txt 读取）
-    - 'failed': 获取失败的股票（从 stock_code/failed_stocks.txt 读取）
-    """
+    """股票池管理类，支持多种来源"""
 
     # 股票代码文件映射
     STOCK_CODE_FILES = {
@@ -51,19 +27,6 @@ class StockPool:
         logger: Union[logging.Logger, None] = None,
         stock_code_dir: str = None
     ):
-        """
-        初始化股票池
-        Initialize stock pool
-
-        参数 (Parameters):
-            source: 股票池来源，支持:
-                - 'all_a': 全部A股（使用 Tushare API 获取）
-                - 'csi300', 'sse50', 'csi500' 等: 从 stock_code 文件夹读取
-                - 'failed': 从 stock_code/failed_stocks.txt 读取
-            token: Tushare API Token（用于获取全部A股时必需）
-            logger: 日志记录器
-            stock_code_dir: stock_code 文件夹路径（默认: 项目根目录/stock_code）
-        """
         self.source = source
         self.token = token
         self.logger = logger or logging.getLogger(__name__)
@@ -72,26 +35,17 @@ class StockPool:
 
         # 设置 stock_code 目录
         if stock_code_dir is None:
-            # 默认使用项目根目录下的 stock_code 文件夹
             project_root = Path(__file__).parent.parent.parent
             self.stock_code_dir = project_root / "stock_code"
         else:
             self.stock_code_dir = Path(stock_code_dir)
 
     def get_stock_list(self) -> List[str]:
-        """
-        获取股票池列表
-        Get stock pool list
-
-        返回 (Returns):
-            List[str]: 股票代码列表 (List of stock codes)
-        """
+        """获取股票池列表"""
         if self._stock_list is None:
             if self.source == "all_a":
-                # 使用 Tushare API 获取全部A股
                 self._stock_list = self.get_all_a_stocks()
             elif self.source in self.STOCK_CODE_FILES:
-                # 从 stock_code 文件夹读取
                 self._stock_list = self._get_from_file(self.source)
             else:
                 raise ValueError(
@@ -101,19 +55,13 @@ class StockPool:
         return self._stock_list
 
     def get_all_a_stocks(self) -> List[str]:
-        """
-        获取全部A股代码列表
-        Get all A-shares list
-
-        返回 (Returns):
-            List[str]: A股代码列表 (List of A-share codes)
-        """
+        """获取全部A股代码列表"""
         self._init_api()
 
         try:
             df = self._api.stock_basic(
                 exchange='',
-                list_status='L',  # 只获取上市股票
+                list_status='L',
                 fields='ts_code'
             )
 
@@ -140,19 +88,7 @@ class StockPool:
             self.logger.info("Tushare API initialized")
 
     def _get_from_file(self, source: str) -> List[str]:
-        """
-        从 stock_code 文件夹读取股票列表
-        Get stock list from stock_code directory
-
-        参数 (Parameters):
-            source: 股票池来源（如 'csi300', 'sse50', 'failed' 等）
-
-        返回 (Returns):
-            List[str]: 股票代码列表 (List of stock codes)
-
-        异常 (Raises):
-            FileNotFoundError: 文件不存在 (File not found)
-        """
+        """从 stock_code 文件夹读取股票列表"""
         if source not in self.STOCK_CODE_FILES:
             raise ValueError(f"Unknown source: {source}")
 

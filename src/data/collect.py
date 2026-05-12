@@ -1,25 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-数据收集脚本 - Data Collection Script
-
-提供全量收集和增量收集功能：
-- 全量收集：从2013-01-01到当前时间收集所有股票数据
-- 增量收集：自动判断数据库最新时间，收集新增数据
-
-使用方法:
-    # 全量收集
-    python -m data.collect --mode full
-
-    # 增量收集
-    python -m data.collect --mode incremental
-
-    # 指定股票列表
-    python -m data.collect --mode full --stocks 000001.SZ,000002.SZ
-
-    # 自定义起始日期
-    python -m data.collect --mode full --start 20200101
-"""
+"""数据收集脚本，支持全量收集和增量收集"""
 
 import sys
 import argparse
@@ -48,36 +29,18 @@ def collect_full(
     logger=None,
     update_failed_file: bool = False
 ) -> dict:
-    """
-    全量数据收集
-
-    从固定起始日期（默认2013-01-01）到当前时间收集所有股票数据。
-    收集后覆盖数据库中的全部数据。
-
-    参数:
-        token: Tushare API Token
-        db_path: 数据库文件路径
-        start_date: 开始日期，格式 YYYYMMDD，默认 20130101
-        end_date: 结束日期，格式 YYYYMMDD，默认最近交易日
-        stock_list: 股票代码列表，为 None 时获取全部A股
-        logger: 日志记录器
-        update_failed_file: 是否更新 failed_stocks.txt 文件（当收集失败的股票时）
-
-    返回:
-        dict: 收集统计信息
-    """
+    """全量数据收集，从固定起始日期到当前时间收集所有股票数据"""
     logger.info("=" * 60)
     logger.info("开始全量数据收集")
-    logger.info("Starting Full Data Collection")
     logger.info("=" * 60)
 
     # 1. 确定时间范围
     if end_date is None:
         end_date = datetime.now().strftime('%Y%m%d')
-        logger.info(f"结束日期 (End date): {end_date}")
+        logger.info(f"结束日期: {end_date}")
 
-    logger.info(f"时间范围 (Date range): {start_date} - {end_date}")
-    logger.info(f"说明 (Note): 将覆盖数据库中的全部历史数据\n")
+    logger.info(f"时间范围: {start_date} - {end_date}")
+    logger.info(f"说明: 将覆盖数据库中的全部历史数据\n")
 
     # 2. 初始化组件
     fetcher = TushareFetcher(token=token, logger=logger)
@@ -111,11 +74,10 @@ def collect_full(
     # 5. 打印统计信息
     logger.info("\n" + "=" * 60)
     logger.info("全量数据收集完成")
-    logger.info("Full Data Collection Completed")
-    logger.info(f"总股票数 (Total): {stats['total']}")
-    logger.info(f"成功 (Success): {stats['success']}")
-    logger.info(f"失败 (Failed): {stats['failed']}")
-    logger.info(f"总记录数 (Total records): {stats['total_records']}")
+    logger.info(f"总股票数: {stats['total']}")
+    logger.info(f"成功: {stats['success']}")
+    logger.info(f"失败: {stats['failed']}")
+    logger.info(f"总记录数: {stats['total_records']}")
     logger.info("=" * 60)
 
     # 6. 更新 failed_stocks.txt 文件（如果需要）
@@ -129,17 +91,8 @@ def collect_full(
 
 
 def _update_failed_stocks_file(stats: dict, logger):
-    """
-    更新 failed_stocks.txt 文件
-
-    如果有失败的股票，更新文件内容；如果全部成功，删除文件。
-
-    参数:
-        stats: 收集统计信息
-        logger: 日志记录器
-    """
+    """更新 failed_stocks.txt，全部成功时删除文件"""
     if not stats.get('failed_stocks'):
-        # 没有失败的股票，删除文件
         project_root = Path(__file__).parent.parent.parent
         failed_file = project_root / "stock_code" / "failed_stocks.txt"
 
@@ -148,7 +101,6 @@ def _update_failed_stocks_file(stats: dict, logger):
             logger.info(f"已删除失败股票文件: {failed_file}")
         return
 
-    # 有失败的股票，更新文件
     project_root = Path(__file__).parent.parent.parent
     failed_file = project_root / "stock_code" / "failed_stocks.txt"
 
@@ -160,7 +112,6 @@ def _update_failed_stocks_file(stats: dict, logger):
         f.write(f"# 更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write("#" + "=" * 50 + "\n\n")
 
-        # 写入股票代码
         for stock in stats['failed_stocks']:
             f.write(f"{stock}\n")
 
@@ -169,22 +120,7 @@ def _update_failed_stocks_file(stats: dict, logger):
 
 
 def _get_next_day(date: str) -> str:
-    """
-    获取指定日期之后的一天（用于增量收集的起始日期）
-
-    直接返回日期+1，让 Tushare API 自动处理非交易日。
-    Returns date + 1 directly, letting Tushare API handle non-trading days automatically.
-
-    参数 (Parameters):
-        date: 指定日期，格式 YYYYMMDD
-
-    返回 (Returns):
-        str: 下一天日期，格式 YYYYMMDD
-
-    示例 (Examples):
-        20260212 (周五) -> 20260213 (周六) -> Tushare 从下周一开始获取
-        20260214 (周日) -> 20260215 (周一) -> Tushare 从周一开始获取
-    """
+    """获取指定日期之后的一天，直接 +1 让 Tushare API 自动处理非交易日"""
     from datetime import datetime, timedelta
 
     date_obj = datetime.strptime(date, '%Y%m%d')
@@ -199,32 +135,17 @@ def collect_incremental(
     logger: Optional[logging.Logger] = None,
     update_failed_file: bool = True
 ) -> dict:
-    """
-    增量数据收集
-
-    自动判断数据库中每只股票的最新数据时间，收集从最新时间到当前时间的新增数据。
-
-    参数:
-        token: Tushare API Token
-        db_path: 数据库文件路径
-        stock_list: 股票代码列表，为 None 时更新数据库中所有股票
-        logger: 日志记录器
-        update_failed_file: 是否更新 failed_stocks.txt 文件
-
-    返回:
-        dict: 收集统计信息
-    """
+    """增量数据收集，自动判断每只股票的最新时间并收集新增数据"""
     if logger is None:
         logger = logging.getLogger(__name__)
 
     logger.info("=" * 60)
     logger.info("开始增量数据收集")
-    logger.info("Starting Incremental Data Collection")
     logger.info("=" * 60)
 
     # 1. 获取当前日期
     end_date = datetime.now().strftime('%Y%m%d')
-    logger.info(f"目标日期 (Target date): {end_date}\n")
+    logger.info(f"目标日期: {end_date}\n")
 
     # 2. 初始化组件
     fetcher = TushareFetcher(token=token, logger=logger)
@@ -232,13 +153,11 @@ def collect_incremental(
 
     # 3. 确定股票列表
     if stock_list is None:
-        # 获取数据库中所有股票（从 stock_daily 表获取唯一股票代码）
         stock_list = local_store.get_all_stocks_from_daily()
         logger.info(f"数据库中共有 {len(stock_list)} 只股票\n")
 
         if not stock_list:
             logger.warning("数据库为空，请先运行全量收集 (collect --mode full)")
-            logger.warning("Database is empty, please run full collection first")
             return {
                 'total_stocks': 0,
                 'need_update': 0,
@@ -249,7 +168,7 @@ def collect_incremental(
             }
 
     # 4. 为每只股票计算增量更新的起始日期，并分类
-    stocks_need_update = []  # 需要更新的股票列表（包含起始日期信息）
+    stocks_need_update = []
     skipped_count = 0
 
     for stock_code in stock_list:
@@ -282,7 +201,7 @@ def collect_incremental(
             'skipped': skipped_count
         }
 
-    # 5. 批量更新需要更新的股票（使用统一的代码风格）
+    # 5. 批量更新需要更新的股票
     stats = {
         'total': len(stocks_need_update),
         'success': 0,
@@ -295,25 +214,21 @@ def collect_incremental(
         try:
             logger.info(f"[{idx}/{len(stocks_need_update)}] {stock_code}: {last_date} -> {end_date}")
 
-            # 获取增量数据
             df = fetcher.fetch_daily(stock_code, start_date, end_date)
 
             if df is not None and len(df) > 0:
-                # 验证数据完整性
                 validation_result = local_store.validate_daily_data(df, stock_code)
 
                 if not validation_result['is_valid']:
                     stats['failed'] += 1
                     stats['failed_stocks'].append(stock_code)
-                    logger.error(f"  ✗ 数据验证失败 (Data validation failed): {validation_result['errors'][:3]}")
+                    logger.error(f"  ✗ 数据验证失败: {validation_result['errors'][:3]}")
                     continue
 
-                # 显示验证警告（如果有）
                 if validation_result['warnings']:
                     for warning in validation_result['warnings']:
                         logger.warning(f"  ⚠ {warning}")
 
-                # 保存到数据库
                 saved_count = local_store.save_daily_data(df)
                 stats['total_records'] += saved_count
                 stats['success'] += 1
@@ -333,13 +248,12 @@ def collect_incremental(
     # 7. 打印统计信息
     logger.info("\n" + "=" * 60)
     logger.info("增量数据收集完成")
-    logger.info("Incremental Data Collection Completed")
-    logger.info(f"总股票数 (Total): {len(stock_list)}")
-    logger.info(f"需要更新 (Need update): {stats['need_update']}")
-    logger.info(f"已是最新 (Skipped): {stats['skipped']}")
-    logger.info(f"成功 (Success): {stats['success']}")
-    logger.info(f"失败 (Failed): {stats['failed']}")
-    logger.info(f"新增记录 (New records): {stats['total_records']}")
+    logger.info(f"总股票数: {len(stock_list)}")
+    logger.info(f"需要更新: {stats['need_update']}")
+    logger.info(f"已是最新: {stats['skipped']}")
+    logger.info(f"成功: {stats['success']}")
+    logger.info(f"失败: {stats['failed']}")
+    logger.info(f"新增记录: {stats['total_records']}")
     logger.info("=" * 60)
 
     # 8. 更新 failed_stocks.txt 文件（如果需要）
@@ -355,10 +269,10 @@ def collect_incremental(
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(
-        description='数据收集脚本 - Data Collection Script',
+        description='数据收集脚本',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
-示例 (Examples):
+示例:
   # 全量收集（从2013-01-01开始，收集全部A股）
   python -m data.collect --mode full
 
@@ -387,35 +301,35 @@ def main():
         type=str,
         choices=['full', 'incremental'],
         required=True,
-        help='收集模式 (Collection mode): full=全量收集, incremental=增量收集'
+        help='收集模式: full=全量收集, incremental=增量收集'
     )
 
     parser.add_argument(
         '--config',
         type=str,
         default=None,
-        help='配置文件路径 (Config file path)'
+        help='配置文件路径'
     )
 
     parser.add_argument(
         '--stocks',
         type=str,
         default=None,
-        help='股票代码列表，逗号分隔 (Stock codes, comma-separated)'
+        help='股票代码列表，逗号分隔'
     )
 
     parser.add_argument(
         '--start',
         type=str,
         default=None,
-        help='起始日期，格式 YYYYMMDD (Start date in YYYYMMDD format), 仅用于全量收集'
+        help='起始日期，格式 YYYYMMDD，仅用于全量收集'
     )
 
     parser.add_argument(
         '--end',
         type=str,
         default=None,
-        help='结束日期，格式 YYYYMMDD (End date in YYYYMMDD format)'
+        help='结束日期，格式 YYYYMMDD'
     )
 
 
@@ -423,13 +337,13 @@ def main():
         '--source',
         type=str,
         default=None,
-        help='股票池来源 (Stock pool source): csi300/sse50/csi500/csi1000/sz50/cyb50/star50'
+        help='股票池来源: csi300/sse50/csi500/csi1000/sz50/cyb50/star50'
     )
 
     parser.add_argument(
         '--verbose',
         action='store_true',
-        help='详细日志输出 (Verbose logging)'
+        help='详细日志输出'
     )
 
     args = parser.parse_args()
@@ -515,11 +429,10 @@ def main():
                 update_failed_file=update_failed_file
             )
 
-        # 返回状态码
         sys.exit(0 if stats['failed'] == 0 else 1)
 
     except Exception as e:
-        logger.error(f"发生错误 (Error): {e}")
+        logger.error(f"发生错误: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
