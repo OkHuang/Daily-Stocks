@@ -8,6 +8,7 @@ This module implements the Relative Strength Index (RSI) oversold strategy.
 import pandas as pd
 from typing import Dict, Any
 from .base import Strategy, StrategyMixin
+from ..utils.indicators import calculate_rsi
 
 
 class RSIOversoldStrategy(Strategy, StrategyMixin):
@@ -60,7 +61,7 @@ class RSIOversoldStrategy(Strategy, StrategyMixin):
 
         # 计算 RSI
         # Calculate RSI
-        df['rsi'] = self._calculate_rsi(df['close'], period)
+        df['rsi'] = calculate_rsi(df, period=period, column='close')
 
         # 计算超卖信号
         # Calculate oversold signals
@@ -80,39 +81,3 @@ class RSIOversoldStrategy(Strategy, StrategyMixin):
         # Use unified signal building method
         return self.build_signals(signals, df)
 
-    def _calculate_rsi(self, prices: pd.Series, period: int) -> pd.Series:
-        """
-        计算 RSI 指标
-        Calculate RSI indicator
-
-        RSI = 100 - (100 / (1 + RS))
-        其中 RS = 平均上涨幅度 / 平均下跌幅度
-        Where RS = Average gain / Average loss
-
-        参数 (Parameters):
-            prices: 收盘价序列 (Closing price series)
-            period: 计算周期 (Calculation period)
-
-        返回 (Returns):
-            pd.Series: RSI 值序列 (RSI value series)
-        """
-        # 计算价格变化
-        # Calculate price changes
-        delta = prices.diff()
-
-        # 分离上涨和下跌
-        # Separate gains and losses
-        gains = delta.where(delta > 0, 0)
-        losses = -delta.where(delta < 0, 0)
-
-        # 计算平均上涨和下跌（使用 Wilder's smoothing）
-        # Calculate average gains and losses (using Wilder's smoothing)
-        avg_gains = gains.rolling(window=period).mean()
-        avg_losses = losses.rolling(window=period).mean()
-
-        # 计算 RS 和 RSI
-        # Calculate RS and RSI
-        rs = avg_gains / avg_losses
-        rsi = 100 - (100 / (1 + rs))
-
-        return rsi
