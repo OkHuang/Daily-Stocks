@@ -133,32 +133,3 @@ class PromptTemplates:
             raise ValueError(f"Template not found: {template_name}")
 
         return template.format(**kwargs)
-
-    def format_stocks_for_prompt(self, df: pd.DataFrame) -> str:
-        """
-        将选股结果格式化为适合提示词的文本
-        Format stock selection results into text suitable for prompts
-
-        参数 (Parameters):
-            df: 选股结果 (Stock selection results)
-
-        返回 (Returns):
-            str: 格式化的股票信息 (Formatted stock information)
-        """
-        # TODO: 实现 DataFrame 到文本的格式化
-        pass
-
-    def generate_analysis_prompt(self, df: pd.DataFrame, date: str) -> str:
-        """
-        生成完整的分析提示词
-        Generate complete analysis prompt
-
-        参数 (Parameters):
-            df: 选股结果 (Stock selection results)
-            date: 日期 (Date)
-
-        返回 (Returns):
-            str: 分析提示词 (Analysis prompt)
-        """
-        # TODO: 实现分析提示词生成逻辑
-        pass
