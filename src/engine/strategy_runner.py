@@ -111,6 +111,8 @@ class StrategyRunner:
 
         df = df.copy()
 
+        n_before = len(df.columns)
+
         # 预计算常用指标
         # Precompute common indicators
 
@@ -130,22 +132,22 @@ class StrategyRunner:
         df['rsi24'] = calculate_rsi(df, period=24, column='close')
 
         # MACD
-        macd_df = calculate_macd(df, fast=12, slow=26, signal=9, column='close')
-        df['macd_dif'] = macd_df['dif']
-        df['macd_dea'] = macd_df['dea']
-        df['macd_histogram'] = macd_df['histogram']
+        dif, dea, macd_hist = calculate_macd(df, fast_period=12, slow_period=26, signal_period=9, column='close')
+        df['macd_dif'] = dif
+        df['macd_dea'] = dea
+        df['macd_histogram'] = macd_hist
 
         # KDJ
-        kdj_df = calculate_kdj(df, n_period=9, m1_period=3, m2_period=3)
-        df['kdj_k'] = kdj_df['k']
-        df['kdj_d'] = kdj_df['d']
-        df['kdj_j'] = kdj_df['j']
+        k, d, j = calculate_kdj(df, n_period=9, m1_period=3, m2_period=3)
+        df['kdj_k'] = k
+        df['kdj_d'] = d
+        df['kdj_j'] = j
 
         # 标记已预计算
         # Mark as precomputed
         df['__precomputed__'] = True
 
-        self.logger.debug(f"Precomputed {len(df.columns) - len(df.columns) - 1} indicator columns")
+        self.logger.debug(f"Precomputed {len(df.columns) - n_before - 1} indicator columns")
 
         return df
 
